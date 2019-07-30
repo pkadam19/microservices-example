@@ -1,5 +1,5 @@
 node {
-    stage ('Checkout'){
+    stage ('Checkout SCM'){
         git 'https://github.com/pkadam19/microservices-example.git'
     }
     stage ('compose up'){
