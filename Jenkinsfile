@@ -1,13 +1,10 @@
 node {
     stage ('Checkout SCM'){
         git 'https://github.com/pkadam19/microservices-example.git'
-        bash '''#!/bin/bash
-            echo "sdkjnsdflks"
-        '''
     }
     stage ('compose up'){
+        // Verify and remove if prev containers are present
         sh '''
-           // Verify and remove if prev containers are present
            #!/bin/bash
            if [ $(docker ps -a | grep test2 | wc -l) -gt 0 ]
            then
