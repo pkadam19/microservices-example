@@ -9,13 +9,13 @@ node {
            if [ $(docker ps -a | grep test2 | wc -l) -gt 0 ]
            then
                echo "Destroying prev. Container if it is already there"
-               docker ps -a
-               docker stop $(docker ps -a | grep test2)
+               docker ps -a | grep test2 | awk '{print $1,$2 }'
+               docker ps -a | grep test2 | awk '{print $1}' | xargs -I {} docker stop {}
                sleep 5
-               docker rm $(docker ps -a | grep test2)
+               docker ps -a | grep test2 | awk '{print $1}' | xargs -I {} docker rm {}
                echo "Removed older containers"
            else
-               echo "Old Container is not runninng"
+               echo "Old Containers are not runninng"
           fi
         '''
 
@@ -25,13 +25,12 @@ node {
            if [ $(docker images | grep test2 | wc -l) -gt 0 ]
            then
                echo "Removing older images"
-               docker images
-               docker images $(docker ps  | grep test2)
+               docker images | grep test2 | awk '{print $1,$2,$3}'
                sleep 5
-               docker rmi $(docker images | grep test2)
+               docker images | grep test2 | awk '{print $3}' | xargs -I {} docker rmi {}
                echo "Removed Older images"
            else
-               echo "Old Container is not runninng"
+               echo "Old images are not present"
           fi
         '''
 
@@ -42,7 +41,20 @@ node {
     }
     stage ('compose down'){
         step([$class: 'DockerComposeBuilder', dockerComposeFile: 'docker-compose.yml', option: [$class: 'StopAllServices'], useCustomDockerComposeFile: true])
-        sh 'docker ps -a'
-        sh 'docker images'
+    }
+    stage ('Destroy onatiner and images') {
+        sh '''
+            docker ps -l
+            docker ps -a | grep test2 | awk '{print $1,$2 }'
+            docker ps -a | grep test2 | awk '{print $1}' | xargs -I {} docker stop {}
+            sleep 2
+            docker ps -a | grep test2 | awk '{print $1}' | xargs -I {} docker rm {}
+        '''
+        sh '''
+           docker images
+           docker images | grep test2 | awk '{print $1,$2,$3}'
+           sleep 2
+           docker images | grep test2 | awk '{print $3}' | xargs -I {} docker rmi {}
+        '''
     }
 }
