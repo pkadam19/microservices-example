@@ -1,6 +1,9 @@
 node {
     stage ('Checkout SCM'){
         git 'https://github.com/pkadam19/microservices-example.git'
+        bash '''#!/bin/bash
+            echo "sdkjnsdflks"
+        '''
     }
     stage ('compose up'){
         sh '''
