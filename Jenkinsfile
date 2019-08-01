@@ -3,7 +3,7 @@ node {
         git 'https://github.com/pkadam19/microservices-example.git'
     }
     stage ('compose up'){
-        sh ```
+        sh '''
            // Verify and remove if prev containers are present
            #!/bin/bash
            if [ $(docker ps -a | grep test2 | wc -l) -gt 0 ]
@@ -17,10 +17,10 @@ node {
            else
                echo "Old Container is not runninng"
           fi
-        ```
+        '''
 
         // Verify and remove if prev images are present
-        sh ```
+        sh '''
            #!/bin/bash
            if [ $(docker images | grep test2 | wc -l) -gt 0 ]
            then
@@ -33,6 +33,7 @@ node {
            else
                echo "Old Container is not runninng"
           fi
+        '''
 
         step([$class: 'DockerComposeBuilder', dockerComposeFile: 'docker-compose.yml', option: [$class: 'StartAllServices'], useCustomDockerComposeFile: true])
 //        step([$class: 'DockerComposeBuilder', dockerComposeFile: 'docker-compose.yml', option: [$class: 'StartService', scale: 1, service: 'web'], useCustomDockerComposeFile: false])
